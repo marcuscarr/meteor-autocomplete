@@ -5,6 +5,8 @@ class Autocomplete
     Mongo.Collection._publishCursor(cursor, sub, "autocompleteRecords")
 
 Meteor.publish 'autocomplete-recordset', (selector, options, collName) ->
+  console.log('subscribing to autocomplete collection', collName)
+
   collection = global[collName]
   unless collection
     throw new Error(collName + ' is not defined on the global namespace of the server.')

@@ -197,9 +197,8 @@ class @AutoComplete
 
   onItemClick: (doc, e) => @processSelection(doc, @rules[@matched])
 
-  onItemHover: (doc, e) ->
-    @tmplInst.$(".-autocomplete-item").removeClass("selected")
-    $(e.target).closest(".-autocomplete-item").addClass("selected")
+  onItemHover: (doc, e) -> 
+    @markSelected($(e.target).closest(".-autocomplete-item"))
 
   filteredList: ->
     # @ruleDep.depend() # optional as long as we use depend on filter, because list will always get re-rendered
@@ -329,31 +328,44 @@ class @AutoComplete
 
     unless selectedItem.length
       # Select anything
-      @tmplInst.$(".-autocomplete-item:first-child").addClass("selected")
+      @markSelected(@tmplInst.$(".-autocomplete-item:first-child"))
 
   # Select next item in list
   next: ->
     currentItem = @tmplInst.$(".-autocomplete-item.selected")
     return unless currentItem.length # Don't try to iterate an empty list
-    currentItem.removeClass("selected")
 
     next = currentItem.next()
+
     if next.length
-      next.addClass("selected")
+      @markSelected(next)
     else # End of list or lost selection; Go back to first item
-      @tmplInst.$(".-autocomplete-item:first-child").addClass("selected")
+      @markSelected(@tmplInst.$(".-autocomplete-item:first-child"))
 
   # Select previous item in list
   prev: ->
     currentItem = @tmplInst.$(".-autocomplete-item.selected")
     return unless currentItem.length # Don't try to iterate an empty list
-    currentItem.removeClass("selected")
 
     prev = currentItem.prev()
+
     if prev.length
-      prev.addClass("selected")
+      @markSelected(prev)
     else # Beginning of list or lost selection; Go to end of list
-      @tmplInst.$(".-autocomplete-item:last-child").addClass("selected")
+      @markSelected(@tmplInst.$(".-autocomplete-item:last-child"))
+
+  # Temporarily select an autocomplete item, triggering the appropriate callback
+  markSelected: ($item) ->
+    @tmplInst.$(".-autocomplete-item").removeClass("selected")
+    $item.addClass("selected")
+    
+    doc = Blaze.getData($item[0])
+    
+    if doc
+      console.log("Marked as selected", doc)
+    else
+      console.log("Couldn't find a doc for", $item)
+
 
   # This doesn't need to be reactive because list already changes reactively
   # and will cause all of the items to re-render anyway
