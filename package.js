@@ -1,5 +1,5 @@
 Package.describe({
-  name: "mizzao:autocomplete",
+  name: "riffyn:autocomplete",
   summary: "Client/server autocompletion designed for Meteor's collections and reactivity",
   version: "0.5.1",
   git: "https://github.com/mizzao/meteor-autocomplete.git"
@@ -31,7 +31,7 @@ Package.onUse(function (api) {
 });
 
 Package.onTest(function(api) {
-  api.use("mizzao:autocomplete");
+  api.use("riffyn:autocomplete");
 
   api.use('coffeescript');
   api.use('mongo');
