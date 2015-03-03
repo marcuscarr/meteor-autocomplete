@@ -134,6 +134,11 @@ class @AutoComplete
     startpos = @element.selectionStart
     val = @getText().substring(0, startpos)
 
+    # wait for at least 3 chars before commencing search
+    if val.length < 3
+      @hideList()
+      return
+
     ###
       Matching on multiple expressions.
       We always go from a matched state to an unmatched one
@@ -356,16 +361,16 @@ class @AutoComplete
 
   # Temporarily select an autocomplete item, triggering the appropriate callback
   markSelected: ($item) ->
-    @tmplInst.$(".-autocomplete-item").removeClass("selected")
+    $items = @tmplInst.$(".-autocomplete-item")
+
+    if $items.length == 0 and !Blaze.currentView 
+      return
+
+    $items.removeClass("selected")
     $item.addClass("selected")
     
     doc = Blaze.getData($item[0])
-    
-    if doc
-      console.log("Marked as selected", doc)
-    else
-      console.log("Couldn't find a doc for", $item)
-
+    console.log("Marked as selected", doc)
 
   # This doesn't need to be reactive because list already changes reactively
   # and will cause all of the items to re-render anyway
