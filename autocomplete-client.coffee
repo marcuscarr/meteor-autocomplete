@@ -375,7 +375,8 @@ class @AutoComplete
     $item.addClass("selected")
     
     doc = Blaze.getData($item[0])
-    console.log("Marked as selected", doc)
+    # console.log("Marked as selected", doc)
+    $item.trigger("selected", doc)
 
   # This doesn't need to be reactive because list already changes reactively
   # and will cause all of the items to re-render anyway
