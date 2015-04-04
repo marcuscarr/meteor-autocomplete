@@ -82,7 +82,7 @@ class @AutoComplete
     @ruleDep = new Deps.Dependency
     @filterDep = new Deps.Dependency
     @loadingDep = new Deps.Dependency
-    
+
     # autosubscribe to the record set published by the server based on the filter
     # This will tear down server subscriptions when they are no longer being used.
     @sub = null
@@ -146,6 +146,9 @@ class @AutoComplete
       @hideList()
       return
 
+    if (val.substring(0,1) in ["~", "@"]) and val.length < 4
+      @hideList()
+      return
     ###
       Matching on multiple expressions.
       We always go from a matched state to an unmatched one
@@ -209,7 +212,7 @@ class @AutoComplete
 
   onItemClick: (doc, e) => @processSelection(doc, @rules[@matched])
 
-  onItemHover: (doc, e) -> 
+  onItemHover: (doc, e) ->
     @markSelected($(e.target).closest(".-autocomplete-item"))
 
   filteredList: ->
@@ -368,12 +371,12 @@ class @AutoComplete
   markSelected: ($item) ->
     $items = @tmplInst.$(".-autocomplete-item")
 
-    if $items.length == 0 and !Blaze.currentView 
+    if $items.length == 0 and !Blaze.currentView
       return
 
     $items.removeClass("selected")
     $item.addClass("selected")
-    
+
     doc = Blaze.getData($item[0])
     # console.log("Marked as selected", doc)
     $item.trigger("selected", doc)
