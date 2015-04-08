@@ -201,7 +201,7 @@ class @AutoComplete
     # TODO this is a bit of a hack; see if we can't be smarter
     Meteor.setTimeout =>
       @hideList()
-    , 500
+    , 50
 
   onItemClick: (doc, e) => @processSelection(doc, @rules[@matched])
 
@@ -268,8 +268,7 @@ class @AutoComplete
       # TODO this is a hack; see above
       @onBlur()
 
-    # TODO: behave better if the callback throws an error
-    rule.callback?(doc, @$element) # Notify that the item has been selected
+    @$element.trigger("chosen", doc)
     return
 
   # Replace the appropriate region
