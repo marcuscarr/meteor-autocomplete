@@ -69,6 +69,7 @@ class @AutoComplete
   constructor: (settings) ->
     @limit = settings.limit || 5
     @position = settings.position || "bottom"
+    @minChars = settings.minChars || 3
 
     @rules = settings.rules
     validateRule(rule) for rule in @rules
@@ -141,8 +142,8 @@ class @AutoComplete
     startpos = @element.selectionStart
     val = @getText().substring(0, startpos)
 
-    # wait for at least 3 chars before commencing search
-    if val.length < 3
+    # wait for at least n chars before commencing search
+    if val.length < @minChars
       @hideList()
       return
 
