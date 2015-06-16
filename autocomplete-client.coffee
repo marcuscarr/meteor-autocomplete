@@ -176,7 +176,7 @@ class @AutoComplete
 
     switch e.keyCode
       when 9, 13 # TAB, ENTER
-        if @select() # Don't jump fields or submit if select successful
+        if @select(e) # Don't jump fields or submit if select successful
           e.preventDefault()
           e.stopPropagation()
       # preventDefault needed below to avoid moving cursor when selecting
@@ -197,14 +197,16 @@ class @AutoComplete
     # or the caret position (selectionStart) will not be correct
     Meteor.defer => @onKeyUp()
 
-  onBlur: ->
+  onBlur: (e) ->
     # We need to delay this so click events work
     # TODO this is a bit of a hack; see if we can't be smarter
     Meteor.setTimeout =>
       @hideList()
-    , 50
+    , 200
 
-  onItemClick: (doc, e) => @processSelection(doc, @rules[@matched])
+  onItemClick: (doc, e) =>
+    console.log("OIASHJDIOSAJDOISHAJDIOHDSAIODHSDIOHDIOSAHDIOSAHDIOHS")
+    @processSelection(doc, @rules[@matched])
 
   onItemHover: (doc, e) ->
     @markSelected($(e.target).closest(".-autocomplete-item"))
@@ -242,15 +244,20 @@ class @AutoComplete
 
     return showing
 
-  # Replace text with currently selected item
-  select: ->
+  # Handle selection of autocomplete result item
+  select: (e) ->
     node = @tmplInst.find(".-autocomplete-item.selected")
     return false unless node?
-    doc = Blaze.getData(node)
-    return false unless doc # Don't select if nothing matched
 
-    @processSelection(doc, @rules[@matched])
-    return true
+    if node.classList.contains("footer")
+      @triggerFooterAction(e)
+      return true
+    else 
+      doc = Blaze.getData(node)
+      return false unless doc # Don't select if nothing matched
+
+      @processSelection(doc, @rules[@matched])
+      return true
 
   processSelection: (doc, rule) ->
     replacement = getField(doc, rule.field)
@@ -271,6 +278,9 @@ class @AutoComplete
 
     @$element.trigger("chosen", doc)
     return
+
+  triggerFooterAction: (e) ->
+    @$element.trigger(@rules[@matched].footerAction)
 
   # Replace the appropriate region
   replace: (replacement) ->
@@ -371,6 +381,9 @@ class @AutoComplete
 
     $items.removeClass("selected")
     $item.addClass("selected")
+
+    if $item.hasClass("footer")
+      return
 
     doc = Blaze.getData($item[0])
     # console.log("Marked as selected", doc)

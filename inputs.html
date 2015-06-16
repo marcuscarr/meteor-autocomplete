@@ -23,6 +23,11 @@
                     {{/with}}
                 </li>
                 {{/each}}
+                {{#if footerTemplate}}
+                <li class="-autocomplete-item footer">
+                    {{> footerTemplate }}
+                </li>
+                {{/if}}
             </ul>
             {{else}}
                 {{> noMatchTemplate }}
@@ -32,6 +37,10 @@
         {{/if}}
     </div>
     {{/if}}
+</template>
+
+<template name="_footer">
+    (<i>default footer</i>)
 </template>
 
 <template name="_noMatch">
