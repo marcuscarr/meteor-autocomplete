@@ -212,7 +212,6 @@ class @AutoComplete
     , 200
 
   onItemClick: (doc, e) =>
-    console.log("OIASHJDIOSAJDOISHAJDIOHDSAIODHSDIOHDIOSAHDIOSAHDIOHS")
     @processSelection(doc, @rules[@matched])
 
   onItemHover: (doc, e) ->
@@ -259,7 +258,9 @@ class @AutoComplete
     if node.classList.contains("footer")
       @triggerFooterAction(e)
       return true
-    else 
+    else if node.classList.contains("no-match")
+      @triggerNoMatchAction(e)
+    else
       doc = Blaze.getData(node)
       return false unless doc # Don't select if nothing matched
 
@@ -288,6 +289,9 @@ class @AutoComplete
 
   triggerFooterAction: (e) ->
     @$element.trigger(@rules[@matched].footerAction)
+
+  triggerNoMatchAction: (e) ->
+    @$element.trigger(@rules[@matched].noMatchAction)
 
   # Replace the appropriate region
   replace: (replacement) ->
