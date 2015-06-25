@@ -132,6 +132,8 @@ class @AutoComplete
 
   onKeyUp: ->
     return unless @$element # Don't try to do this while loading
+    @$element.removeClass("chosen")
+
     startpos = @element.selectionStart
     val = @getText().substring(0, startpos)
 
@@ -208,7 +210,7 @@ class @AutoComplete
     @processSelection(doc, @rules[@matched])
 
   onItemHover: (doc, e) ->
-    @markSelected($(e.target).closest(".-autocomplete-item"))
+    @markSelected($(e.target).closest(".-autocomplete-item.selectable"))
 
   filteredList: ->
     # @ruleDep.depend() # optional as long as we use depend on filter, because list will always get re-rendered
@@ -251,8 +253,6 @@ class @AutoComplete
     if node.classList.contains("footer")
       @triggerFooterAction(e)
       return true
-    else if node.classList.contains("no-match")
-      @triggerNoMatchAction(e)
     else
       doc = Blaze.getData(node)
       return false unless doc # Don't select if nothing matched
@@ -277,11 +277,16 @@ class @AutoComplete
       # TODO this is a hack; see above
       @onBlur()
 
-    @$element.trigger("chosen", doc)
-    return
+    @$element
+      .addClass("chosen")
+      .trigger("chosen", doc)    
 
   triggerFooterAction: (e) ->
-    @$element.trigger(@rules[@matched].footerAction)
+    @$element
+      .trigger(@rules[@matched].footerAction)
+      .blur()
+    @hideList()
+    @setText("")      
 
   triggerNoMatchAction: (e) ->
     @$element.trigger(@rules[@matched].noMatchAction)
@@ -347,38 +352,38 @@ class @AutoComplete
   ensureSelection : ->
     # Re-render; make sure selected item is something in the list or none if list empty
     selectedItem = @tmplInst.$(".-autocomplete-item.selected")
+    selectableItems = @tmplInst.$(".-autocomplete-item.selectable")
 
-    unless selectedItem.length
-      # Select anything
-      @markSelected(@tmplInst.$(".-autocomplete-item:first-child"))
+    unless selectedItem.length > 0 or selectableItems.length == 0
+      @markSelected(selectableItems.first())
 
   # Select next item in list
   next: ->
     currentItem = @tmplInst.$(".-autocomplete-item.selected")
     return unless currentItem.length # Don't try to iterate an empty list
 
-    next = currentItem.next()
+    next = currentItem.next(".selectable")
 
     if next.length
       @markSelected(next)
     else # End of list or lost selection; Go back to first item
-      @markSelected(@tmplInst.$(".-autocomplete-item:first-child"))
+      @markSelected(@tmplInst.$(".-autocomplete-item.selectable:first-child"))
 
   # Select previous item in list
   prev: ->
     currentItem = @tmplInst.$(".-autocomplete-item.selected")
     return unless currentItem.length # Don't try to iterate an empty list
 
-    prev = currentItem.prev()
+    prev = currentItem.prev(".selectable")
 
     if prev.length
       @markSelected(prev)
     else # Beginning of list or lost selection; Go to end of list
-      @markSelected(@tmplInst.$(".-autocomplete-item:last-child"))
+      @markSelected(@tmplInst.$(".-autocomplete-item.selectable:last-child"))
 
   # Temporarily select an autocomplete item, triggering the appropriate callback
   markSelected: ($item) ->
-    $items = @tmplInst.$(".-autocomplete-item")
+    $items = @tmplInst.$(".-autocomplete-item.selectable")
 
     if $items.length == 0 and !Blaze.currentView
       return

@@ -43,7 +43,6 @@ Template._autocompleteContainer.destroyed = ->
 Template._autocompleteContainer.events
   # t.data is the AutoComplete instance; `this` is the data item
   "click .-autocomplete-item.footer": (e, t) -> t.data.triggerFooterAction(e)
-  "click .-autocomplete-item.no-match": (e, t) -> t.data.triggerNoMatchAction(e)
   "click .-autocomplete-item:not(.footer)": (e, t) -> t.data.onItemClick(this, e)
   "mouseenter .-autocomplete-item": (e, t) -> t.data.onItemHover(this, e)
 

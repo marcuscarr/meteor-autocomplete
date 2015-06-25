@@ -1,48 +1,50 @@
 <template name="inputAutocomplete">
-    <input type="text" {{attributes}}>
-    {{> autocompleteContainer}}
+  <input type="text" {{attributes}}>
+  {{> autocompleteContainer}}
 </template>
 
 <template name="textareaAutocomplete">
-    <textarea {{attributes}}>{{> UI.contentBlock}}</textarea>
-    {{> autocompleteContainer}}
+  <textarea {{attributes}}>{{> UI.contentBlock}}</textarea>
+  {{> autocompleteContainer}}
 </template>
 
 <template name="_autocompleteContainer">
-    {{#if isShowing}}
-    <div class='-autocomplete-container'>
-        {{#if isLoaded}}
-            {{#unless empty}}
-            <ul class='-autocomplete-list'>
-                {{#each filteredList}}
-                <li class="-autocomplete-item">
-                    {{#with ../currentTemplate }}
-                        {{#with ..}}  {{! original 'data' context to itemTemplate}}
-                            {{> ..}}  {{! return value from itemTemplate }}
-                        {{/with}}
-                    {{/with}}
-                </li>
-                {{/each}}
-                {{#if footerTemplate}}
-                <li class="-autocomplete-item footer">
-                    {{> footerTemplate }}
-                </li>
-                {{/if}}
-            </ul>
-            {{else}}
-                {{> noMatchTemplate }}       
-            {{/unless}}
+  {{#if isShowing}}
+  <div class='-autocomplete-container'>
+    <ul class='-autocomplete-list'>
+      {{#if isLoaded}}
+        {{#if empty}}
+          <li class="-autocomplete-item no-match">
+            {{> noMatchTemplate }}
+          </li>
         {{else}}
-            <i>loading...</i>
+          {{#each filteredList}}
+          <li class="-autocomplete-item selectable">
+            {{#with ../currentTemplate }}
+              {{#with ..}}  {{! original 'data' context to itemTemplate}}
+                {{> ..}}  {{! return value from itemTemplate }}
+              {{/with}}
+            {{/with}}
+          </li>
+          {{/each}}
         {{/if}}
-    </div>
-    {{/if}}
+        {{#if footerTemplate}}
+          <li class="-autocomplete-item footer selectable">
+            {{> footerTemplate }}
+          </li>
+        {{/if}}
+      {{else}}
+        <li class='-autocomplete-item loading'>Loading</li>
+      {{/if}}
+    </ul>
+  </div>
+  {{/if}}
 </template>
 
 <template name="_footer">
-    (<i>default footer</i>)
+  (<i>default footer</i>)
 </template>
 
 <template name="_noMatch">
-    (<i>no matches</i>)
+  (<i>no matches</i>)
 </template>
