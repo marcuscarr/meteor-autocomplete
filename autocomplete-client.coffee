@@ -185,9 +185,10 @@ class @AutoComplete
 
     switch e.keyCode
       when 9, 13 # TAB, ENTER
-        if @select(e) # Don't jump fields or submit if select successful
-          e.preventDefault()
-          e.stopPropagation()
+        e.preventDefault()
+        e.stopPropagation()
+        return not @select() # Don't jump fields or submit if select successful
+
       # preventDefault needed below to avoid moving cursor when selecting
       when 40 # DOWN
         e.preventDefault()
@@ -246,19 +247,20 @@ class @AutoComplete
 
     # Do this after the render
     if showing
-      Meteor.defer =>
+      Meteor.setTimeout =>
         @positionContainer()
         @ensureSelection()
+      , 25
 
     return showing
 
   # Handle selection of autocomplete result item
-  select: (e) ->
+  select: () ->
     node = @tmplInst.find(".-autocomplete-item.selected")
     return false unless node?
 
     if node.classList.contains("footer")
-      @triggerFooterAction(e)
+      @triggerFooterAction()
       return true
     else
       doc = Blaze.getData(node)
@@ -286,14 +288,14 @@ class @AutoComplete
 
     @$element
       .addClass("chosen")
-      .trigger("chosen", doc)    
+      .trigger("chosen", doc)
 
   triggerFooterAction: (e) ->
     @$element
       .trigger(@rules[@matched].footerAction)
       .blur()
     @hideList()
-    @setText("")      
+    @setText("")
 
   triggerNoMatchAction: (e) ->
     @$element.trigger(@rules[@matched].noMatchAction)
@@ -330,30 +332,46 @@ class @AutoComplete
     Rendering functions
   ###
   positionContainer: ->
-    # First render; Pick the first item and set css whenever list gets shown
     position = @$element.position()
-
     rule = @matchedRule()
 
-    offset = getCaretCoordinates(@element, @element.selectionStart)
+    style =
+      left: position.left
+      opacity: 1
 
-    # In whole-field positioning, we don't move the container and make it the
-    # full width of the field.
-    if rule? and isWholeField(rule)
-      pos =
-        left: position.left
-        width: @$element.outerWidth()               # position.offsetWidth
+    if @position is "auto"
+      # Determine if we should place results above or below
+      #
+      $results = @tmplInst.$(".-autocomplete-list")
+      offset = @$element.offset()
+
+      style["width"] = @$element.outerWidth()
+
+      if offset.top + $results.height() > $(document).height()
+        style.bottom = 25
+        style["max-height"] = "130px"
+        style["overflow-y"] = "auto"
+      else
+        style.top = position.top + @$element.outerHeight()
+
+    else if rule? and isWholeField(rule)
+      # In whole-field positioning, we don't move the container and make it the
+      # full width of the field.
+      # TODO allow this to render top as well, and possibly used in textareas?
+      style.top = position.top + @$element.outerHeight() # position.offsetHeight
+      style.width = @$element.outerWidth()               # position.offsetWidth
+
     else # Normal positioning, at token word
-      pos =
-        left: position.left + offset.left
+      offset = getCaretCoordinates(@element, @element.selectionStart)
+      style.left += offset.left
 
-    # Position menu from top (above) or from bottom of caret (below, default)
-    if @position is "top"
-      pos.bottom = @$element.offsetParent().height() - position.top - offset.top
-    else
-      pos.top = position.top + offset.top + parseInt(@$element.css('font-size'))
+      # Position menu from top (above) or from bottom of caret (below, default)
+      if @position is "top" #or @position is "auto" and tooCloseToBottom(@$element)
+        style.bottom = @$element.offsetParent().height() - position.top - offset.top
+      else
+        style.top = position.top + offset.top + parseInt(@$element.css('font-size'))
 
-    @tmplInst.$(".-autocomplete-container").css(pos)
+    @tmplInst.$(".-autocomplete-container").css(style)
 
   ensureSelection : ->
     # Re-render; make sure selected item is something in the list or none if list empty
