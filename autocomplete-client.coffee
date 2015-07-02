@@ -210,6 +210,7 @@ class @AutoComplete
   onBlur: (e) ->
     # We need to delay this so click events work
     # TODO this is a bit of a hack; see if we can't be smarter
+    console.log("BLURRRR", e)
     Meteor.setTimeout =>
       @hideList()
     , 200
@@ -336,6 +337,7 @@ class @AutoComplete
     rule = @matchedRule()
 
     style =
+      position: 'absolute'
       left: position.left
       opacity: 1
 
@@ -345,16 +347,18 @@ class @AutoComplete
       $results = @tmplInst.$(".-autocomplete-list")
       offset = @$element.offset()
 
-      style["width"] = @$element.outerWidth()
+      style.width = @$element.outerWidth()
 
       if offset.top + $results.height() > $(document).height()
-        style.bottom = 25
-        style["max-height"] = "130px"
-        style["overflow-y"] = "auto"
+        style.position = 'fixed'
+        style.left = offset.left
+        style.top = offset.top - $results.height()
+        # TODO some kind of scroll handling - would probably suffice to hide on scroll
+        $(window).one("scroll", @onBlur)
       else
         style.top = position.top + @$element.outerHeight()
 
-    else if rule? and isWholeField(rule)
+    else if rule? and isWholeField(rule) and @position is not "auto"
       # In whole-field positioning, we don't move the container and make it the
       # full width of the field.
       # TODO allow this to render top as well, and possibly used in textareas?
