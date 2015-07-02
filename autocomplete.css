@@ -6,6 +6,8 @@
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
     min-width: 180px;
     z-index: 1000;
+    transition: opacity 0.35s;
+    opacity: 0;
 }
 
 .-autocomplete-list {
