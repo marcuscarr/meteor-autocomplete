@@ -210,7 +210,6 @@ class @AutoComplete
   onBlur: (e) ->
     # We need to delay this so click events work
     # TODO this is a bit of a hack; see if we can't be smarter
-    console.log("BLURRRR", e)
     Meteor.setTimeout =>
       @hideList()
     , 200
@@ -358,22 +357,12 @@ class @AutoComplete
       else
         style.top = position.top + @$element.outerHeight()
 
-    else if rule? and isWholeField(rule) and @position is not "auto"
+    else 
       # In whole-field positioning, we don't move the container and make it the
       # full width of the field.
       # TODO allow this to render top as well, and possibly used in textareas?
       style.top = position.top + @$element.outerHeight() # position.offsetHeight
       style.width = @$element.outerWidth()               # position.offsetWidth
-
-    else # Normal positioning, at token word
-      offset = getCaretCoordinates(@element, @element.selectionStart)
-      style.left += offset.left
-
-      # Position menu from top (above) or from bottom of caret (below, default)
-      if @position is "top" #or @position is "auto" and tooCloseToBottom(@$element)
-        style.bottom = @$element.offsetParent().height() - position.top - offset.top
-      else
-        style.top = position.top + offset.top + parseInt(@$element.css('font-size'))
 
     @tmplInst.$(".-autocomplete-container").css(style)
 
