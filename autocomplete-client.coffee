@@ -348,7 +348,7 @@ class @AutoComplete
 
       style.width = @$element.outerWidth()
 
-      if offset.top + $results.height() > $(document).height()
+      if (offset.top + $results.height() + 20) > $(document).height()
         style.position = 'fixed'
         style.left = offset.left
         style.top = offset.top - $results.height()
