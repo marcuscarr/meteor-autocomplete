@@ -21,7 +21,7 @@ Package.onUse(function (api) {
     'autocomplete-client.coffee',
     'templates.coffee'
   ], 'client');
-  
+
   api.addFiles([
     'autocomplete-server.coffee'
   ], 'server');
