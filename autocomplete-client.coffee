@@ -58,8 +58,6 @@ getField = (obj, str) ->
 
 class @AutoComplete
 
-  @FIND_ME: "HERE I AM LILI"
-
   @KEYS: [
     40, # DOWN
     38, # UP
@@ -334,37 +332,45 @@ class @AutoComplete
     Rendering functions
   ###
   positionContainer: ->
-    position = @$element.position()
+    el = @$element
+    position = el.position()
     rule = @matchedRule()
 
     style =
       position: 'absolute'
       left: position.left
+      width: el.outerWidth()
       opacity: 1
 
     if @position is "auto"
+      console.log "auto positioning autocomplete dropdown"
       # Determine if we should place results above or below
       #
       $results = @tmplInst.$(".-autocomplete-list")
-      offset = @$element.offset()
+      offset = el.offset()
 
-      style.width = @$element.outerWidth()
+      console.log "offset", offset
+      console.log "results height", $results.height()
+      console.log "doc height", $(document).height()
 
       if (offset.top + $results.height() + 20) > $(document).height()
+        console.log "positioning dropdown above"
+
         style.position = 'fixed'
         style.left = offset.left
         style.top = offset.top - $results.height()
         # TODO some kind of scroll handling - would probably suffice to hide on scroll
         $(window).one("scroll", @onBlur)
       else
-        style.top = position.top + @$element.outerHeight()
+        console.log "positioning dropdown below"
+        style.top = position.top + el.outerHeight()
 
-    else 
+    else
       # In whole-field positioning, we don't move the container and make it the
       # full width of the field.
       # TODO allow this to render top as well, and possibly used in textareas?
-      style.top = position.top + @$element.outerHeight() # position.offsetHeight
-      style.width = @$element.outerWidth()               # position.offsetWidth
+      console.log "positioning dropdown relative to container"
+      style.top = position.top + el.outerHeight() # position.offsetHeight
 
     @tmplInst.$(".-autocomplete-container").css(style)
 
