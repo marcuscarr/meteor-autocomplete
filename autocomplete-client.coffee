@@ -58,6 +58,8 @@ getField = (obj, str) ->
 
 class @AutoComplete
 
+  @FIND_ME: "HERE I AM LILI"
+
   @KEYS: [
     40, # DOWN
     38, # UP
