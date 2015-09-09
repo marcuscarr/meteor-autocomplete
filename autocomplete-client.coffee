@@ -242,15 +242,20 @@ class @AutoComplete
 
   isShowing: ->
     rule = @matchedRule()
+
     # Same rules as above
     showing = rule? and (rule.token or @getFilter())
 
     # Do this after the render
+    # n.b. had to revert to a long timeout as asking jquery for the DOM height()
+    # is not reliable in deployed environment where results arrive more slowly
+    # and thus panel takes a while to reach full height
+
     if showing
       Meteor.setTimeout =>
         @positionContainer()
         @ensureSelection()
-      , 25
+      , 100
 
     return showing
 
@@ -343,17 +348,13 @@ class @AutoComplete
       opacity: 1
 
     if @position is "auto"
-      console.log "auto positioning autocomplete dropdown"
-      # Determine if we should place results above or below
-      #
       $results = @tmplInst.$(".-autocomplete-list")
       offset = el.offset()
+      resultPanelHeight = $results.height() + el.outerHeight()
 
-      console.log "offset", offset
-      console.log "results height", $results.height()
-      console.log "doc height", $(document).height()
+      positionAbove = (offset.top + resultPanelHeight) > $(document).height()
 
-      if (offset.top + $results.height() + 20) > $(document).height()
+      if positionAbove
         console.log "positioning dropdown above"
 
         style.position = 'fixed'
