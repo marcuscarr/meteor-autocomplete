@@ -235,7 +235,23 @@ class @AutoComplete
     Meteor.defer => @ensureSelection()
 
     # if server collection, the server has already done the filtering work
-    return AutoCompleteRecords.find({}, options) if isServerSearch(rule)
+
+    # TODO: Add to rules to make this specific to the searches where it's necessary.
+    if isServerSearch(rule)
+      if rule.autocompleteSort
+        hits = AutoCompleteRecords.find({}, options).fetch()
+
+        # Return the results that start with the query string first, sorted by length
+        val = @getText()
+        typeaheadResults = _.filter( hits, (hit) -> hit.name.search( "^#{val}.*" ) > -1 )
+        typeaheadResults = _.sortBy( typeaheadResults, (hit) -> return hit.name.length )
+        otherResults = _.filter( hits, (hit) -> return hit not in typeaheadResults )
+
+        # Then append the remaining results
+        sortedResults = typeaheadResults.concat( otherResults )
+        return sortedResults
+      else
+        return AutoCompleteRecords.find({}, options)
 
     # Otherwise, search on client
     return rule.collection.find(selector, options)
