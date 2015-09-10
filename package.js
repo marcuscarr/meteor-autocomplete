@@ -1,7 +1,7 @@
 Package.describe({
   name: "riffyn:autocomplete",
   summary: "Client/server autocompletion designed for Meteor's collections and reactivity",
-  version: "0.4.11",
+  version: "0.4.12",
   git: "https://github.com/mizzao/meteor-autocomplete.git"
 });
 
@@ -21,7 +21,7 @@ Package.onUse(function (api) {
     'autocomplete-client.coffee',
     'templates.coffee'
   ], 'client');
-  
+
   api.addFiles([
     'autocomplete-server.coffee'
   ], 'server');

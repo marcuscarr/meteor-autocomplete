@@ -228,20 +228,36 @@ class @AutoComplete
     Meteor.defer => @ensureSelection()
 
     # if server collection, the server has already done the filtering work
-    return AutoCompleteRecords.find({}, options) if isServerSearch(rule)
+
+    # TODO: Add to rules to make this specific to the searches where it's necessary.
+    if isServerSearch(rule)
+      if rule.autocompleteSort
+        hits = AutoCompleteRecords.find({}, options).fetch()
+
+        # Return the results that start with the query string first, sorted by length
+        val = @getText()
+        typeaheadResults = _.filter( hits, (hit) -> hit.name.search( "^#{val}.*" ) > -1 )
+        typeaheadResults = _.sortBy( typeaheadResults, (hit) -> return hit.name.length )
+        otherResults = _.filter( hits, (hit) -> return hit not in typeaheadResults )
+
+        # Then append the remaining results
+        sortedResults = typeaheadResults.concat( otherResults )
+        return sortedResults
+      else
+        return AutoCompleteRecords.find({}, options)
 
     # Otherwise, search on client
     return rule.collection.find(selector, options)
 
   isShowing: ->
     rule = @matchedRule()
-    
+
     # Same rules as above
     showing = rule? and (rule.token or @getFilter())
 
     # Do this after the render
     # n.b. had to revert to a long timeout as asking jquery for the DOM height()
-    # is not reliable in deployed environment where results arrive more slowly 
+    # is not reliable in deployed environment where results arrive more slowly
     # and thus panel takes a while to reach full height
 
     if showing
@@ -286,14 +302,14 @@ class @AutoComplete
 
     @$element
       .addClass("chosen")
-      .trigger("chosen", doc)    
+      .trigger("chosen", doc)
 
   triggerFooterAction: (e) ->
     @$element
       .trigger(@rules[@matched].footerAction)
       .blur()
     @hideList()
-    @setText("")      
+    @setText("")
 
   triggerNoMatchAction: (e) ->
     @$element.trigger(@rules[@matched].noMatchAction)
@@ -339,7 +355,7 @@ class @AutoComplete
       left: position.left
       width: el.outerWidth()
       opacity: 1
-    
+
     if @position is "auto"
       $results = @tmplInst.$(".-autocomplete-list")
       offset = el.offset()
