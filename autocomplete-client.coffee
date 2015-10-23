@@ -247,9 +247,12 @@ class @AutoComplete
 
     # Otherwise, search on client
     if rule.autocompleteSort
+      # Need to get back a lot of results to capture all prefix matches
+      limit = options.limit
+      options.limit = 50
       hits = rule.collection.find(selector, options).fetch()
       val = @getText()
-      return @autocompleteSort(hits, val)
+      return @autocompleteSort(hits, val).slice(0, limit)
     else
       return rule.collection.find(selector, options)
 
