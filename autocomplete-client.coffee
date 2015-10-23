@@ -240,21 +240,27 @@ class @AutoComplete
     if isServerSearch(rule)
       if rule.autocompleteSort
         hits = AutoCompleteRecords.find({}, options).fetch()
-
-        # Return the results that start with the query string first, sorted by length
         val = @getText()
-        typeaheadResults = _.filter( hits, (hit) -> hit.name.search( "^#{val}.*" ) > -1 )
-        typeaheadResults = _.sortBy( typeaheadResults, (hit) -> return hit.name.length )
-        otherResults = _.filter( hits, (hit) -> return hit not in typeaheadResults )
-
-        # Then append the remaining results
-        sortedResults = typeaheadResults.concat( otherResults )
-        return sortedResults
+        return @autocompleteSort(hits, val)
       else
         return AutoCompleteRecords.find({}, options)
 
     # Otherwise, search on client
-    return rule.collection.find(selector, options)
+    if rule.autocompleteSort
+      hits = rule.collection.find(selector, options).fetch()
+      val = @getText()
+      return @autocompleteSort(hits, val)
+    else
+      return rule.collection.find(selector, options)
+
+  autocompleteSort: (hits, query_string) ->
+      # Return the results that start with the query string first, sorted by length
+    typeaheadResults = _.filter( hits, (hit) -> hit.name.search( "^#{query_string}.*" ) > -1 )
+    typeaheadResults = _.sortBy( typeaheadResults, (hit) -> return hit.name.length )
+    otherResults = _.filter( hits, (hit) -> return hit not in typeaheadResults )
+
+    # Then append the remaining results
+    return typeaheadResults.concat( otherResults )
 
   isShowing: ->
     rule = @matchedRule()
