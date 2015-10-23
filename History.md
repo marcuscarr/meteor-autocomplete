@@ -1,5 +1,15 @@
 ## vNEXT
 
+* Fix an issue where an extraneous `collection` field was required for custom server-side subscriptions. (#40)
+
+## v0.5.1
+
+* Allow either top or bottom positioning in both normal and whole-field modes. (#75)
+
+## v0.5.0
+
+* Switch to jQuery events instead of callbacks; you can now detect autocomplete selections using a template's event map. **Callbacks are no longer supported.** See the demo for a use example. (#48, #56)
+
 ## v0.4.10
 
 * Make the `Autocomplete.publishCursor(cursor, subscription)` function available on the server, which greatly simplifies the process of returning results for an autocomplete query over a publication.

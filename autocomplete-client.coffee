@@ -1,10 +1,17 @@
 AutoCompleteRecords = new Mongo.Collection("autocompleteRecords")
 
-isServerSearch = (rule) -> _.isString(rule.collection)
+isServerSearch = (rule) -> rule.subscription? || _.isString(rule.collection)
 
 validateRule = (rule) ->
-  if rule.subscription? and not Match.test(rule.collection, String)
-    throw new Error("Collection name must be specified as string for server-side search")
+  if rule.subscription? and rule.collection?
+    throw new Error("Rule cannot specify both a server-side subscription and a client/server collection to search simultaneously")
+
+  unless rule.subscription? or Match.test(rule.collection, Match.OneOf(String, Mongo.Collection))
+    throw new Error("Collection to search must be either a Mongo collection or server-side name")
+
+  # XXX back-compat message, to be removed
+  if rule.callback?
+    console.warn("autocomplete no longer supports callbacks; use event listeners instead.")
 
 isWholeField = (rule) ->
   # either '' or null both count as whole field.
@@ -448,5 +455,6 @@ class @AutoComplete
 
 AutocompleteTest =
   records: AutoCompleteRecords
+  isServerSearch: isServerSearch
   getRegExp: getRegExp
   getFindParams: getFindParams
