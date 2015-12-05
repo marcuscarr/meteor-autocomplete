@@ -1,7 +1,7 @@
 Package.describe({
   name: "riffyn:autocomplete",
   summary: "Client/server autocompletion designed for Meteor's collections and reactivity",
-  version: "0.4.15",
+  version: "0.4.16",
   git: "https://github.com/RiffynInc/meteor-autocomplete.git"
 });
 
