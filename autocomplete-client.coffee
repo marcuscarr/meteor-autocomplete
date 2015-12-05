@@ -296,9 +296,11 @@ class @AutoComplete
   # Handle selection of autocomplete result item
   select: () ->
     node = @tmplInst.find(".-autocomplete-item.selected")
-    return false unless node?
-
-    if node.classList.contains("footer")
+    
+    if not node?
+      @triggerNoMatchAction()
+      return false
+    else if node.classList.contains("footer")
       @triggerFooterAction()
       return true
     else
@@ -337,7 +339,14 @@ class @AutoComplete
     @setText("")
 
   triggerNoMatchAction: (e) ->
-    @$element.trigger(@rules[@matched].noMatchAction)
+    action = @rules[@matched].noMatchAction
+    inputText = @getText()
+
+    @hideList()
+    @setText("")
+    
+    if action
+      @$element.trigger(action, inputText)
 
   # Replace the appropriate region
   replace: (replacement) ->
