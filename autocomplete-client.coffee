@@ -225,7 +225,7 @@ class @AutoComplete
 
     [ selector, options ] = getFindParams(rule, filter, @limit)
 
-    Meteor.defer => @ensureSelection()
+    # Meteor.defer => @ensureSelection()
 
     # if server collection, the server has already done the filtering work
 
@@ -289,14 +289,14 @@ class @AutoComplete
       Meteor.setTimeout =>
         @positionContainer()
         @ensureSelection()
-      , 100
+      , 150
 
     return showing
 
   # Handle selection of autocomplete result item
   select: () ->
     node = @tmplInst.find(".-autocomplete-item.selected")
-    
+
     if not node?
       @triggerNoMatchAction()
       return false
@@ -344,7 +344,7 @@ class @AutoComplete
 
     @hideList()
     @setText("")
-    
+
     if action
       @$element.trigger(action, inputText)
 
