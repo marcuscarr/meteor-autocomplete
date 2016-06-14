@@ -96,8 +96,9 @@ class @AutoComplete
       # console.debug 'Subscribing to <%s> in <%s>.<%s>', filter, rule.collection, rule.field
       @setLoaded(false)
       subName = rule.subscription || "autocomplete-recordset"
+      processScopeIds = rule.processScopeIds
       @sub = Meteor.subscribe(subName,
-        selector, options, rule.collection, => @setLoaded(true))
+        selector, options, rule.collection, processScopeIds, => @setLoaded(true))
 
   teardown: ->
     # Stop the reactive computation we started for this autocomplete instance
