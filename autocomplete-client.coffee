@@ -395,14 +395,24 @@ class @AutoComplete
       $results = @tmplInst.$(".-autocomplete-list")
       offset = el.offset()
       resultPanelHeight = $results.height() + el.outerHeight()
-
       positionAbove = (offset.top + resultPanelHeight) > $(document).height()
 
       if positionAbove
-        console.log "positioning dropdown above"
+        ancestorHasTransform = el.parents().filter(->
+          trans = $(this).css("transform")  
+          return trans != "none"; 
+        ).length > 0
 
-        style.left = position.left
-        style.top = -($results.height() + 3)
+        if ancestorHasTransform
+          console.log "positioning dropdown above - abosolute"
+          style.left = position.left
+          style.top = -($results.height() + 3)
+        else 
+          console.log "positioning dropdown above - fixed"
+          style.position = "fixed"
+          style.left = offset.left
+          style.top = offset.top - ($results.height() + 3)
+
         # TODO some kind of scroll handling - would probably suffice to hide on scroll
         $(window).one("scroll", @onBlur)
       else
