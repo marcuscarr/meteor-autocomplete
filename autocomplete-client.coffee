@@ -97,6 +97,8 @@ class @AutoComplete
       @setLoaded(false)
       subName = rule.subscription || "autocomplete-recordset"
       processScopeIds = rule.processScopeIds
+      options.filterOptions = rule.filterOptions;
+
       @sub = Meteor.subscribe(subName,
         selector, options, rule.collection, processScopeIds, => @setLoaded(true))
 
