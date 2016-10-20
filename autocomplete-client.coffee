@@ -292,7 +292,7 @@ class @AutoComplete
       Meteor.setTimeout =>
         @positionContainer()
         @ensureSelection()
-      , 150
+      , 300
 
     return showing
 
@@ -401,15 +401,15 @@ class @AutoComplete
 
       if positionAbove
         ancestorHasTransform = el.parents().filter(->
-          trans = $(this).css("transform")  
-          return trans != "none"; 
+          trans = $(this).css("transform")
+          return trans != "none";
         ).length > 0
 
         if ancestorHasTransform
           console.log "positioning dropdown above - abosolute"
           style.left = position.left
           style.top = -($results.height() + 3)
-        else 
+        else
           console.log "positioning dropdown above - fixed"
           style.position = "fixed"
           style.left = offset.left
