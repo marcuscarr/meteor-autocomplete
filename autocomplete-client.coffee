@@ -256,18 +256,22 @@ class @AutoComplete
     # Return the results that start with the query string first, sorted by length
     # All typeahead results on name come first, then all synonyms, finally all
     # symbols. BUT, a full-string match to a name or synonym is put first.
+
+    # if query_string has special characters search could fail for invalid
+    # regular expresions, then is better escape query_string and create a RegExp
+    query = new RegExp "^" + _.escapeRegExp(query_string) + ".*"
     typeaheadResults = _.filter( hits, (hit) ->
-      return hit.name.search( "^#{query_string}.*" ) > -1 or
-        _.any(hit.synonyms, (syn) -> syn.search( "^#{query_string}.*" ) > -1) or
-        hit.symbol?.search( "^#{query_string}.*" ) > -1
+      return hit.name.search( query ) > -1 or
+        _.any(hit.synonyms, (syn) -> syn.search( query ) > -1) or
+        hit.symbol?.search( query ) > -1
     )
     typeaheadResults = _.sortBy( typeaheadResults, (hit) ->
       if query_string is hit.name or _.any(hit.synonyms, (syn) -> query_string is syn)
         return 0
-      if hit.name.search( "^#{query_string}.*" ) > -1
+      if hit.name.search( query ) > -1
         return hit.name.length
-      else if _.any(hit.synonyms, (syn) -> syn.search( "^#{query_string}.*" ) > -1)
-        matchingSynonym = _.find(hit.synonyms, (syn) -> syn.search( "^#{query_string}.*" ) > -1)
+      else if _.any(hit.synonyms, (syn) -> syn.search( query ) > -1)
+        matchingSynonym = _.find(hit.synonyms, (syn) -> syn.search( query ) > -1)
         return matchingSynonym.length + 100
       else
         return hit.symbol?.length + 200
