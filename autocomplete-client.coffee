@@ -266,10 +266,13 @@ class @AutoComplete
         hit.symbol?.search( query ) > -1
     )
     typeaheadResults = _.sortBy( typeaheadResults, (hit) ->
+      # sort SYSTEM properties before USER_DEFINED using offSet
+      offSet = if (hit.source? and hit.source == "SYSTEM") then 0 else 0.5
+
       if query_string is hit.name or _.any(hit.synonyms, (syn) -> query_string is syn)
-        return 0
+        return offSet
       if hit.name.search( query ) > -1
-        return hit.name.length
+        return hit.name.length + offSet
       else if _.any(hit.synonyms, (syn) -> syn.search( query ) > -1)
         matchingSynonym = _.find(hit.synonyms, (syn) -> syn.search( query ) > -1)
         return matchingSynonym.length + 100
