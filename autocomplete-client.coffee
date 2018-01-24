@@ -259,26 +259,31 @@ class @AutoComplete
 
     # if query_string has special characters search could fail for invalid
     # regular expresions, then is better escape query_string and create a RegExp
+    query_string = query_string.toLowerCase()
     query = new RegExp "^" + _.escapeRegExp(query_string) + ".*"
+
     typeaheadResults = _.filter( hits, (hit) ->
-      return hit.name.search( query ) > -1 or
-        _.any(hit.synonyms, (syn) -> syn.search( query ) > -1) or
-        hit.symbol?.search( query ) > -1
+      return hit.name.toLowerCase().search( query ) > -1 or
+        _.any(hit.synonyms, (syn) -> syn.toLowerCase().search( query ) > -1) or
+        hit.symbol?.toLowerCase().search( query ) > -1
     )
+
     typeaheadResults = _.sortBy( typeaheadResults, (hit) ->
       # sort SYSTEM properties before USER_DEFINED using offSet
       offSet = if (hit.source? and hit.source == "SYSTEM") then 0 else 0.5
+      hitName = hit.name.toLowerCase()
 
-      if query_string is hit.name or _.any(hit.synonyms, (syn) -> query_string is syn)
+      if query_string is hitName or _.any(hit.synonyms, (syn) -> query_string is syn.toLowerCase())
         return offSet
-      if hit.name.search( query ) > -1
-        return hit.name.length + offSet
-      else if _.any(hit.synonyms, (syn) -> syn.search( query ) > -1)
-        matchingSynonym = _.find(hit.synonyms, (syn) -> syn.search( query ) > -1)
+      if hitName.search( query ) > -1
+        return hitName.length + offSet
+      else if _.any(hit.synonyms, (syn) -> syn.toLowerCase().search( query ) > -1)
+        matchingSynonym = _.find(hit.synonyms, (syn) -> syn.toLowerCase().search( query ) > -1)
         return matchingSynonym.length + 100
       else
         return hit.symbol?.length + 200
     )
+
     otherResults = _.filter( hits, (hit) -> return hit not in typeaheadResults )
 
     # Then append the remaining results
