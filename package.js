@@ -1,15 +1,19 @@
 Package.describe({
   name: "riffyn:autocomplete",
   summary: "Client/server autocompletion designed for Meteor's collections and reactivity",
-  version: "0.4.20",
+  version: "0.4.21",
   git: "https://github.com/RiffynInc/meteor-autocomplete.git"
 });
 
+Npm.depends({
+  'underscore': '1.8.3',
+})
+
 Package.onUse(function (api) {
-  api.versionsFrom("1.2.0.2");
+  api.versionsFrom('1.6.0.1');
 
   api.use(['blaze', 'templating', 'jquery'], 'client');
-  api.use(['coffeescript', 'underscore']); // both
+  api.use(['coffeescript']); // both
   api.use(['mongo', 'ddp']);
 
   api.use("dandv:caret-position@2.1.0-3", 'client');
