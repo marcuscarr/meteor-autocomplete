@@ -10,7 +10,7 @@ Npm.depends({
 })
 
 Package.onUse(function (api) {
-  api.versionsFrom('1.6.0.1');
+  api.versionsFrom('1.8.0.2');
 
   api.use(['blaze', 'templating', 'jquery'], 'client');
   api.use(['coffeescript']); // both
